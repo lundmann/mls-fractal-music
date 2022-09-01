@@ -17,12 +17,22 @@
 
 package de.muellerlund.ms.fractalmusic.controller;
 
+import de.muellerlund.math.complex.MutableComplex;
+import de.muellerlund.ms.fractalmusic.calculation.Calculator;
+import de.muellerlund.ms.fractalmusic.calculation.fractals.SquareFractal;
+
+import de.muellerlund.ms.fractalmusic.util.ImageHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+
+import static de.muellerlund.ms.fractalmusic.fractal.FractalHelper.createImage;
+import static de.muellerlund.ms.fractalmusic.util.NumberHelper.parseComplex;
 
 @RestController
 public class MainController {
@@ -30,19 +40,8 @@ public class MainController {
     @Value("${mls.lostandfound.property}")
     private String property;
 
-    @RequestMapping("/hw/")
-    static String home() {
-        return "Hello World!";
-    }
-
-    @RequestMapping("/hw2")
-    String home2(@RequestParam(required = false) String hello) {
-        return property + hello;
-    }
-
-    @GetMapping(value = "/fractal-music/png", produces = MediaType.IMAGE_PNG_VALUE)
-    public @ResponseBody byte[] retrieveAsPng() throws IOException {
-        //return new byte[0];
+    @GetMapping(value = "/fractal-music/sample/png/", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody byte[] retrieveSamplePng() throws IOException {
         String resourceKey = "/de/muellerlund/samples/heic0602inv.png";
         try (InputStream is = getClass().getResourceAsStream(resourceKey)) {
             if (is == null) {
@@ -51,5 +50,20 @@ public class MainController {
 
             return is.readAllBytes();
         }
+    }
+
+    @GetMapping(value = "/fractal-music/png", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody byte[] retrieveAsPng(
+            @RequestParam(required = false) String cc,
+            @RequestParam(required = false) String z0
+    ) {
+        SquareFractal fractal = new SquareFractal();
+        fractal.getC().assign(parseComplex(cc, MutableComplex.i()));
+        MutableComplex w0 = parseComplex(z0, MutableComplex.one());
+
+        List<MutableComplex> numbers = Calculator.calculate(fractal, w0, 10);
+        BufferedImage image = createImage(numbers);
+
+        return ImageHelper.asBytes(image, "png");
     }
 }
