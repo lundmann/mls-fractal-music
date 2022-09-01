@@ -18,8 +18,11 @@
 package de.muellerlund.ms.fractalmusic.controller;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 public class MainController {
@@ -32,8 +35,21 @@ public class MainController {
         return "Hello World!";
     }
 
-    @RequestMapping("/hw2/")
-    String home2() {
-        return property;
+    @RequestMapping("/hw2")
+    String home2(@RequestParam(required = false) String hello) {
+        return property + hello;
+    }
+
+    @GetMapping(value = "/fractal-music/png", produces = MediaType.IMAGE_PNG_VALUE)
+    public @ResponseBody byte[] retrieveAsPng() throws IOException {
+        //return new byte[0];
+        String resourceKey = "/de/muellerlund/samples/heic0602inv.png";
+        try (InputStream is = getClass().getResourceAsStream(resourceKey)) {
+            if (is == null) {
+                throw new IllegalStateException(resourceKey + " not found.");
+            }
+
+            return is.readAllBytes();
+        }
     }
 }
