@@ -17,7 +17,8 @@
 
 package de.muellerlund.ms.fractalmusic.fractal;
 
-import de.muellerlund.math.complex.MutableComplex;
+import de.muellerlund.ms.fractalmusic.calculation.ExtendedComplex;
+import org.apache.commons.math3.complex.Complex;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -25,10 +26,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 public final class FractalHelper {
+
     private FractalHelper() {
     }
 
-    public static BufferedImage createImage(List<MutableComplex> numbers) {
+    public static BufferedImage createImage(List<ExtendedComplex> numbers) {
         Rectangle2D.Double r = getBounds(numbers);
         double ratio = r.width / r.height;
 
@@ -41,7 +43,7 @@ public final class FractalHelper {
         int height = (int) (width / ratio);
 
         if (height <= 0) {
-            height = width;
+            height = 100;
         }
 
         double mx = width / (x2 - x1);
@@ -53,28 +55,31 @@ public final class FractalHelper {
         Graphics2D g = image.createGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
-        g.setColor(Color.BLACK);
 
-        for (MutableComplex z : numbers) {
-            int x = (int) (mx * z.real() + bx);
-            int y = (int) (my * z.imag() + by);
+        for (ExtendedComplex ez : numbers) {
+            Complex z = ez.number();
+            Color color = new Color(-ez.depth() * 17 & 255, -ez.depth() * 9 - ez.id() * 23 & 255, -ez.id() * 47 & 255);
+            g.setColor(color);
+            int x = (int) (mx * z.getReal() + bx);
+            int y = (int) (my * z.getImaginary() + by);
             g.drawRect(x, y, 1, 1);
         }
 
         return image;
     }
 
-    private static Rectangle2D.Double getBounds(List<MutableComplex> numbers) {
+    private static Rectangle2D.Double getBounds(List<ExtendedComplex> numbers) {
         double rMin = 0.0;
         double rMax = 0.0;
         double iMin = 0.0;
         double iMax = 0.0;
 
-        for (MutableComplex z : numbers) {
-            rMin = Math.min(rMin, z.real());
-            rMax = Math.max(rMax, z.real());
-            iMin = Math.min(iMin, z.imag());
-            iMax = Math.max(iMax, z.imag());
+        for (ExtendedComplex ez : numbers) {
+            Complex z = ez.number();
+            rMin = Math.min(rMin, z.getReal());
+            rMax = Math.max(rMax, z.getReal());
+            iMin = Math.min(iMin, z.getImaginary());
+            iMax = Math.max(iMax, z.getImaginary());
         }
 
         return new Rectangle2D.Double(rMin, iMin, rMax - rMin, iMax - iMin);

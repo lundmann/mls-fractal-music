@@ -19,18 +19,20 @@ package de.muellerlund.ms.fractalmusic.calculation;
 
 import de.muellerlund.math.complex.MutableComplex;
 
+import org.apache.commons.math3.complex.Complex;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Calculator {
 
-    private final static BigInteger MAX_NUMBERS = BigInteger.valueOf(1 << 10);
+    private final static BigInteger MAX_NUMBERS = BigInteger.valueOf(1 << 20);
 
     private Calculator() {
     }
 
-    public static List<MutableComplex> calculate(ComplexFractal fractal, MutableComplex z0, int maxDepth) {
+    public static List<ExtendedComplex> calculate(ComplexFractal fractal, Complex z0, int maxDepth) {
         if (maxDepth < 1) {
             throw new IllegalArgumentException("Maximal recursion depth should be at least 1.");
         }
@@ -42,20 +44,21 @@ public final class Calculator {
             throw new IllegalArgumentException("Number of needed calculations (" + nd + ") exceeds " + MAX_NUMBERS + ".");
         }
 
-        List<MutableComplex> list = new ArrayList<>();
-        calculate(list, fractal, z0, maxDepth);
+        List<ExtendedComplex> list = new ArrayList<>();
+        calculate(list, fractal, new MutableComplex(z0), 0, maxDepth);
         return list;
     }
 
-    private static void calculate(List<MutableComplex> list, ComplexFractal fractal, MutableComplex z0, int maxDepth) {
+    private static void calculate(List<ExtendedComplex> list, ComplexFractal fractal, MutableComplex z0, int i, int maxDepth) {
         if (maxDepth <= 0) {
             return;
         }
 
-        list.add(z0);
+        list.add(new ExtendedComplex(i, maxDepth, z0.complex()));
 
+        int j = 0;
         for (MutableComplex w : fractal.preImages(z0)) {
-            calculate(list, fractal, w, maxDepth - 1);
+            calculate(list, fractal, w, j++, maxDepth - 1);
         }
     }
 }

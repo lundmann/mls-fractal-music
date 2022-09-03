@@ -18,23 +18,28 @@
 package de.muellerlund.ms.fractalmusic.util;
 
 import de.muellerlund.math.complex.MutableComplex;
+
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.complex.ComplexFormat;
 import org.apache.commons.math3.exception.MathParseException;
 
+import java.util.Locale;
+
 public final class NumberHelper {
+
     private NumberHelper() {
     }
 
-    public static MutableComplex parseComplex(String toParse, MutableComplex defaultValue) {
+    public static MutableComplex parseComplex(String toParse, MutableComplex defaultValue, Locale locale) {
         if (toParse == null) {
             return defaultValue.clone();
         }
 
         try {
-            ComplexFormat format = ComplexFormat.getInstance();
+
+            ComplexFormat format = ComplexFormat.getInstance(locale);
             Complex z = format.parse(toParse);
-            return new MutableComplex(z.getReal(), z.getImaginary());
+            return new MutableComplex(z);
         }
         catch (MathParseException e) {
             return defaultValue.clone();
