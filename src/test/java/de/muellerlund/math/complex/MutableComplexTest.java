@@ -21,9 +21,6 @@ import org.apache.commons.math3.complex.Complex;
 import org.assertj.core.data.Offset;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;
 
@@ -36,52 +33,18 @@ public class MutableComplexTest {
         assertThat(argFraction(z.imag())).isCloseTo(argFraction(w.imag()), eps);
     }
 
-    private static void assertCloseTo(MutableComplex z, MutableComplex w) {
-        assertThat(z.real()).isCloseTo(w.real(), STD_OFFSET);
-        assertThat(z.imag()).isCloseTo(w.imag(), STD_OFFSET);
-    }
-
-    private static void assertCloseTo(MutableComplex z, MutableComplex w, Offset<Double> eps) {
-        assertThat(z.real()).isCloseTo(w.real(), eps);
-        assertThat(z.imag()).isCloseTo(w.imag(), eps);
-    }
-
     private static void assertCloseTo(MutableComplex z, Complex w) {
-        assertCloseTo(z, new MutableComplex(w.getReal(), w.getImaginary()));
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(w.getReal(), w.getImaginary()));
     }
 
     private static void assertCloseTo(MutableComplex z, Complex w, Offset<Double> eps) {
-        assertCloseTo(z, new MutableComplex(w.getReal(), w.getImaginary()), eps);
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(w.getReal(), w.getImaginary()), eps);
     }
 
     private static double argFraction(double y) {
         double x = y / (2.0 * Math.PI);
         x -= Math.floor(x);
         return x * 2.0 * Math.PI;
-    }
-
-    private static List<MutableComplex> someNumbers() {
-        List<MutableComplex> list = new ArrayList<>();
-
-        list.add(new MutableComplex(1.2, 0.4));
-        list.add(new MutableComplex(0.7, -1.6));
-        list.add(new MutableComplex(2.35, 7.02));
-        list.add(new MutableComplex(-0.008, -1.002));
-        list.add(new MutableComplex(-45.008, -100.002));
-
-        return list;
-    }
-
-    private static List<MutableComplex> someSmallNumbers() {
-        List<MutableComplex> list = new ArrayList<>();
-
-        list.add(new MutableComplex(1.2, 0.4));
-        list.add(new MutableComplex(0.7, -1.6));
-        list.add(new MutableComplex(2.3, 7));
-        list.add(new MutableComplex(6.3, -5));
-        list.add(new MutableComplex(-0.8, -1.25));
-
-        return list;
     }
 
     @Test
@@ -121,36 +84,36 @@ public class MutableComplexTest {
     public void testAssignment() {
         MutableComplex z = new MutableComplex(77.7, -2.718);
         MutableComplex w = z.assign(4.7, 2.5);
-        assertCloseTo(z, new MutableComplex(4.7, 2.5));
-        assertCloseTo(w, z);
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(4.7, 2.5));
+        ComplexTestUtil.assertCloseTo(w, z);
 
         z = new MutableComplex();
         w = z.assign(new MutableComplex(-0.7, -1.3));
-        assertCloseTo(z, new MutableComplex(-0.7, -1.3));
-        assertCloseTo(w, z);
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(-0.7, -1.3));
+        ComplexTestUtil.assertCloseTo(w, z);
 
         z.assign(new MutableComplex(0.7, 1.3));
         w = z.clone();
-        assertCloseTo(w, z);
+        ComplexTestUtil.assertCloseTo(w, z);
     }
 
     @Test
     public void testInvolutions() {
         MutableComplex z = MutableComplex.zero();
         z.neg();
-        assertCloseTo(z, MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(z, MutableComplex.zero());
 
         z.assign(-3, 4);
         z.neg();
-        assertCloseTo(z, new MutableComplex(3, -4));
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(3, -4));
 
         z.conj();
-        assertCloseTo(z, new MutableComplex(3, 4));
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(3, 4));
 
         z.inv();
         Complex a = new Complex(3, 4).reciprocal();
         assertCloseTo(z, a);
-        assertCloseTo(z, new MutableComplex(0.12, -0.16));
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(0.12, -0.16));
         z.inv();
         assertCloseTo(z, new Complex(3, 4));
 
@@ -181,27 +144,27 @@ public class MutableComplexTest {
     @Test
     public void testAddition() {
         MutableComplex z = MutableComplex.one().add(MutableComplex.i());
-        assertCloseTo(z, new MutableComplex(1, 1));
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(1, 1));
         z.sub(new MutableComplex(2, 4)).add(new MutableComplex(0, 2));
-        assertCloseTo(z, new MutableComplex(-1, -1));
+        ComplexTestUtil.assertCloseTo(z, new MutableComplex(-1, -1));
     }
 
     @Test
     public void testZeroMultiplication() {
-        for (MutableComplex z : someNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someNumbers()) {
             MutableComplex w = z.clone().rmult(0);
-            assertCloseTo(w, MutableComplex.zero());
+            ComplexTestUtil.assertCloseTo(w, MutableComplex.zero());
             w = z.clone().imult(0);
-            assertCloseTo(w, MutableComplex.zero());
+            ComplexTestUtil.assertCloseTo(w, MutableComplex.zero());
             w = z.clone().mult(MutableComplex.zero());
-            assertCloseTo(w, MutableComplex.zero());
+            ComplexTestUtil.assertCloseTo(w, MutableComplex.zero());
         }
     }
 
     @Test
     public void testMultiplication() {
-        for (MutableComplex z : someNumbers()) {
-            for (MutableComplex w : someNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someNumbers()) {
+            for (MutableComplex w : ComplexTestUtil.someNumbers()) {
                 MutableComplex u = z.clone().mult(w);
                 Complex v = new Complex(z.real(), z.imag()).multiply(new Complex(w.real(), w.imag()));
                 assertCloseTo(u, v);
@@ -215,7 +178,7 @@ public class MutableComplexTest {
 
     @Test
     public void testSquareAndRoot() {
-        for (MutableComplex z : someNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someNumbers()) {
             MutableComplex w = z.clone().sqr();
             Complex u = new Complex(z.real(), z.imag());
             u = u.multiply(u);
@@ -229,15 +192,15 @@ public class MutableComplexTest {
 
     @Test
     public void testPowerByZero() {
-        for (MutableComplex z : someNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someNumbers()) {
             MutableComplex w = z.clone().pow(0);
-            assertCloseTo(w, MutableComplex.one());
+            ComplexTestUtil.assertCloseTo(w, MutableComplex.one());
         }
     }
 
     @Test
     public void testPowerByInteger() {
-        for (MutableComplex z : someNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someNumbers()) {
             for (int p = -3; p <= 3; p++) {
                 MutableComplex w = z.clone().pow(p);
                 Complex u = new Complex(z.real(), z.imag());
@@ -249,8 +212,8 @@ public class MutableComplexTest {
 
     @Test
     public void testPowerByComplex() {
-        for (MutableComplex z : someSmallNumbers()) {
-            for (MutableComplex w : someSmallNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someSmallNumbers()) {
+            for (MutableComplex w : ComplexTestUtil.someSmallNumbers()) {
                 MutableComplex u = z.clone().pow(w);
                 Complex v = new Complex(z.real(), z.imag());
                 v = v.pow(new Complex(w.real(), w.imag()));
@@ -261,7 +224,7 @@ public class MutableComplexTest {
 
     @Test
     public void testExpAndLog() {
-        for (MutableComplex z : someSmallNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someSmallNumbers()) {
             MutableComplex u = z.clone().exp();
             Complex v = new Complex(z.real(), z.imag()).exp();
             assertCloseTo(u, v, APPROX_OFFSET);
@@ -274,7 +237,7 @@ public class MutableComplexTest {
 
     @Test
     public void testTrigonometricFunctions() {
-        for (MutableComplex z : someSmallNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someSmallNumbers()) {
             MutableComplex u = z.clone().sin();
             Complex v = new Complex(z.real(), z.imag()).sin();
             assertCloseTo(u, v, APPROX_OFFSET);
@@ -291,7 +254,7 @@ public class MutableComplexTest {
 
     @Test
     public void testHyperbolicFunctions() {
-        for (MutableComplex z : someSmallNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someSmallNumbers()) {
             MutableComplex u = z.clone().sinh();
             Complex v = new Complex(z.real(), z.imag()).sinh();
             assertCloseTo(u, v, APPROX_OFFSET);
@@ -308,7 +271,7 @@ public class MutableComplexTest {
 
     @Test
     public void testInverseTrigonometricFunctions() {
-        for (MutableComplex z : someSmallNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someSmallNumbers()) {
             MutableComplex u = z.clone().asin();
             Complex v = new Complex(z.real(), z.imag()).asin();
             assertCloseTo(u, v, APPROX_OFFSET);
@@ -328,7 +291,7 @@ public class MutableComplexTest {
 
     @Test
     public void testAreaFunctions() {
-        for (MutableComplex z : someSmallNumbers()) {
+        for (MutableComplex z : ComplexTestUtil.someSmallNumbers()) {
             MutableComplex u = z.clone().arsinh().sinh();
             assertCloseToLog(u, z, APPROX_OFFSET);
 

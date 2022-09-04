@@ -66,9 +66,6 @@ public class MainController {
         MutableComplex w0 = parseComplex(z0, MutableComplex.one(), locale);
         n = n == null ? 10 : n;
 
-        System.out.println(v0);
-        System.out.println(w0);
-
         List<ExtendedComplex> numbers = Calculator.calculate(fractal, w0.complex(), n);
         BufferedImage image = createImage(numbers);
 
