@@ -17,9 +17,11 @@
 
 package de.muellerlund.math.complex;
 
+import org.assertj.core.data.Offset;
 import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.offset;
 
 public class ComplexPolynomialTest {
     @Test
@@ -77,6 +79,31 @@ public class ComplexPolynomialTest {
             MutableComplex v = z.clone().mult(z).imult(2).sub(MutableComplex.one());
             ComplexTestUtil.assertCloseTo(w, v);
         }
+    }
+
+    @Test
+    public void testNormalize() {
+        ComplexPolynomial p = new ComplexPolynomial(new MutableComplex(2), MutableComplex.zero(), new MutableComplex(-1));
+        ComplexPolynomial q = p.normalize();
+        assertThat(q.degree()).isEqualTo(2);
+        ComplexTestUtil.assertCloseTo(q.coefficient(2), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(q.coefficient(1), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(-0.5));
+
+        p = new ComplexPolynomial();
+        q = p.normalize();
+        assertThat(q.degree()).isEqualTo(-1);
+
+        p = new ComplexPolynomial(new MutableComplex(7));
+        q = p.normalize();
+        assertThat(q.degree()).isEqualTo(0);
+        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(7));
+
+        p = new ComplexPolynomial(MutableComplex.i(), new MutableComplex(7));
+        q = p.normalize();
+        assertThat(q.degree()).isEqualTo(1);
+        ComplexTestUtil.assertCloseTo(q.coefficient(1), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(0, -7)); // because 1/i = -i
     }
 
     @Test
@@ -154,5 +181,27 @@ public class ComplexPolynomialTest {
         ComplexTestUtil.assertCloseTo(p.coefficient(2), new MutableComplex(0, 2));
         ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(4, -1));
         ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-1));
+    }
+
+    /**
+     * @see <a href="https://de.wikipedia.org/wiki/Polynomdivision#Division_durch_Linearfaktor">Division durch Linearfaktor</a>
+     */
+    @Test
+    public void testSplitZero() {
+        ComplexPolynomial p = new ComplexPolynomial(new MutableComplex(2),
+                                                    new MutableComplex(-4),
+                                                    new MutableComplex(4),
+                                                    new MutableComplex(3),
+                                                    new MutableComplex(1.5),
+                                                    new MutableComplex(0.75));
+        ComplexPolynomial q = p.splitZero(new MutableComplex(-0.4841657));
+
+        final Offset<Double> OFFSET = offset(1e-6);
+
+        ComplexTestUtil.assertCloseTo(q.coefficient(4), new MutableComplex(2), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.coefficient(3), new MutableComplex(-4.968331), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.coefficient(2), new MutableComplex(6.405496), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.coefficient(1), new MutableComplex(-0.101321), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(1.549056), OFFSET);
     }
 }

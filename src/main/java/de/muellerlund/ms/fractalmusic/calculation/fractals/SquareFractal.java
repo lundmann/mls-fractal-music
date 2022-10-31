@@ -28,7 +28,7 @@ public class SquareFractal implements ComplexFractal {
     private final MutableComplex c;
 
     public SquareFractal() {
-        c = MutableComplex.one().clone();
+        c = MutableComplex.one();
     }
 
     public MutableComplex getC() {

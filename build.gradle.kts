@@ -23,7 +23,7 @@ plugins {
 
 java {
     group = "de.muellerlund"
-    version = "0.0.8-SNAPSHOT"
+    version = "0.0.9-SNAPSHOT"
 
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17

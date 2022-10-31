@@ -17,6 +17,11 @@
 
 package de.muellerlund.math.complex;
 
+import de.muellerlund.util.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public final class NewtonSolver {
     private NewtonSolver() {
     }
@@ -40,23 +45,86 @@ public final class NewtonSolver {
 
         ComplexPolynomial d = p.derivative();
         MutableComplex z = z0.clone();
-        double lastNorm = -1;
 
         while (true) {
             MutableComplex w = p.apply(z);
             double norm = w.norm();
-
-            if (lastNorm > 0.0 && norm >= lastNorm) {
-                throw new IllegalStateException("Iteration diverges.");
-            }
-
-            lastNorm = norm;
 
             if (norm <= eps2) {
                 return z;
             }
 
             z.sub(w.div(d.apply(z)));
+        }
+    }
+
+    public static List<Pair<MutableComplex, Integer>> solveAll(ComplexPolynomial p, MutableComplex z0, double eps2) {
+        if (eps2 <= 0.0) {
+            throw new IllegalArgumentException("ε² must be positive.");
+        }
+
+        List<Pair<MutableComplex, Integer>> zeros = new ArrayList<>();
+        int n = p.degree();
+
+        switch (n) {
+            case -1:
+            case 0:
+                break;
+
+            case 1:
+                MutableComplex z = p.coefficient(0).div(p.coefficient(1)).neg();
+                zeros.add(new Pair<>(z, 1));
+                break;
+
+            case 2:
+                ComplexPolynomial pn = p.normalize();
+                MutableComplex p2 = pn.coefficient(1).rmult(0.5);
+                MutableComplex dis = p2.clone().mult(p2).sub(p.coefficient(0));
+                int quantity = dis.norm() < eps2 ? 2 : 1;
+                dis.sqrt();
+
+                switch (quantity) {
+                    case 1 -> {
+                        zeros.add(new Pair<>(p2.clone().neg().add(dis), 1));
+                        zeros.add(new Pair<>(p2.clone().neg().sub(dis), 1));
+                    }
+                    case 2 -> zeros.add(new Pair<>(p2.clone().neg(), 2));
+                }
+
+                break;
+
+            default:
+                solveHigherOrder(zeros, p, z0, eps2);
+                break;
+        }
+
+        return zeros;
+    }
+
+    private static void solveHigherOrder(List<Pair<MutableComplex, Integer>> zeros, ComplexPolynomial p, MutableComplex z0, double eps2) {
+        if (z0 == null) {
+            z0 = MutableComplex.zero();
+        }
+
+        MutableComplex eta = solve(p, z0, eps2);
+        int quantity = findQuantity(p, eta, eps2);
+        zeros.add(new Pair<>(eta, quantity));
+
+        for (int k = 0; k < quantity; k++) {
+            p = p.splitZero(eta);
+        }
+
+        List<Pair<MutableComplex, Integer>> furtherZeros = solveAll(p, eta, eps2);
+        zeros.addAll(furtherZeros);
+    }
+
+    private static int findQuantity(ComplexPolynomial p, MutableComplex eta, double eps2) {
+        for (int q = 0;; q++) {
+            MutableComplex w = p.apply(eta);
+            if (w.norm() >= eps2) {
+                return q;
+            }
+            p = p.derivative();
         }
     }
 }

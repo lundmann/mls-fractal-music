@@ -124,6 +124,22 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         return s;
     }
 
+    public ComplexPolynomial normalize() {
+        ComplexPolynomial p = clone();
+        int n = degree();
+
+        if (n >= 1) {
+            MutableComplex d = coefficient(n);
+            p.coefficients.get(n).assign(MutableComplex.one());
+
+            for (int k = 0; k < n; k++) {
+                p.coefficients.get(k).div(d);
+            }
+        }
+
+        return p;
+    }
+
     /**
      * Returns the (first order) derivative of this polynomial.
      *
@@ -174,6 +190,30 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
 
         for (int k = 0; k <= n; k++) {
             nc[n - k] = coefficient(k).rmult(1.0 / (k + 1));
+        }
+
+        return new ComplexPolynomial(nc);
+    }
+
+    /**
+     * Returns the result of {@code this / (z - η)}.
+     * @param eta (η) A zero of this.
+     * @return this divide by (z - η).
+     */
+    public ComplexPolynomial splitZero(MutableComplex eta) {
+        int n = degree();
+
+        if (n <= 0) {
+            return new ComplexPolynomial();
+        }
+
+        MutableComplex[] nc = new MutableComplex[n];
+        MutableComplex carry = MutableComplex.zero();
+
+        for (int k = n - 1; k >= 0; k--) {
+            MutableComplex c = coefficient(k + 1);
+            nc[n - k - 1] = c.clone().add(carry);
+            carry.add(c).mult(eta);
         }
 
         return new ComplexPolynomial(nc);

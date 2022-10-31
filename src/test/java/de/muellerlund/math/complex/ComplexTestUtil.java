@@ -17,6 +17,7 @@
 
 package de.muellerlund.math.complex;
 
+import org.assertj.core.api.Fail;
 import org.assertj.core.data.Offset;
 
 import java.util.ArrayList;
@@ -39,6 +40,26 @@ final class ComplexTestUtil {
     static void assertCloseTo(MutableComplex z, MutableComplex w) {
         assertThat(z.real()).isCloseTo(w.real(), STD_OFFSET);
         assertThat(z.imag()).isCloseTo(w.imag(), STD_OFFSET);
+    }
+
+    static void assertContains(List<MutableComplex> list, Offset<Double> offset, MutableComplex ... numbers) {
+        double r0 = offset.value;
+        r0 = r0 * r0;
+
+        for (MutableComplex z : numbers) {
+            boolean contained = false;
+            for (MutableComplex w: list) {
+                MutableComplex r = w.clone().sub(z);
+                if (r.norm() < r0) {
+                    contained = true;
+                    break;
+                }
+            }
+
+            if (!contained) {
+                Fail.fail("Complex number " + z + " not contained.");
+            }
+        }
     }
 
     static List<MutableComplex> someNumbers() {
@@ -64,4 +85,5 @@ final class ComplexTestUtil {
 
         return list;
     }
+
 }
