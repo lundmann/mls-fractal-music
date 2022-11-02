@@ -36,7 +36,6 @@ public final class NumberHelper {
         }
 
         try {
-
             ComplexFormat format = ComplexFormat.getInstance(locale);
             Complex z = format.parse(toParse);
             return new MutableComplex(z);

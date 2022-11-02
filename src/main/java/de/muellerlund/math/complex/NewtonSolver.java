@@ -33,7 +33,9 @@ public final class NewtonSolver {
      * @return A zero of the given complex
      */
     public static MutableComplex solve(ComplexPolynomial p, MutableComplex z0, double eps2) {
-        if (p.degree() <= 1) {
+        int d = p.degree();
+
+        if (d <= 1) {
             throw new IllegalArgumentException("Degree of polynomial must be at leat 2.");
         }
 
@@ -41,7 +43,7 @@ public final class NewtonSolver {
             throw new IllegalArgumentException("ε² must be positive.");
         }
 
-        ComplexPolynomial d = p.derivative();
+        ComplexPolynomial pd = p.derivative();
         MutableComplex z = z0.clone();
 
         while (true) {
@@ -52,7 +54,26 @@ public final class NewtonSolver {
                 return z;
             }
 
-            z.sub(w.div(d.apply(z)));
+            MutableComplex qt = w.clone().div(pd.apply(z));
+            MutableComplex[] next = new MutableComplex[d];
+
+            for (int k = 0; k < d; k++) {
+                next[k] = z.clone().sub(qt.clone().rmult(k + 1));
+            }
+
+            int q = -1;
+            double mn = Double.MAX_VALUE;
+
+            for (int k = 0; k < d; k++) {
+                double nn = z.clone().sub(next[k]).norm();
+
+                if (nn < mn) {
+                    q = k + 1;
+                    mn = nn;
+                }
+            }
+
+            z = next[q - 1];
         }
     }
 
