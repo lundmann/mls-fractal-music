@@ -195,6 +195,49 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         return new ComplexPolynomial(nc);
     }
 
+    public ComplexPolynomial multiply(ComplexPolynomial q) {
+        int n = degree();
+        int m = q.degree();
+
+        if (n < 0) {
+            return this;
+        }
+
+        if (m < 0) {
+            return q;
+        }
+
+        if (n < m) {
+            return q.multiply(this);
+        }
+
+        int nm = n + m;
+        MutableComplex[] nc = new MutableComplex[nm + 1];
+
+        if (m == 0) {
+            MutableComplex b0 = q.coefficient(0);
+            for (int j = 0; j <= n; j++) {
+                nc[n - j] = coefficient(j).mult(b0);
+            }
+        }
+        else {
+            for (int j = 0; j <= nm; j++) {
+                //int cj = nm - j;
+                MutableComplex sum = MutableComplex.zero();
+                for (int i = 0; i <= n; i++) {
+                    int ai = n - i;
+                    int bi = m - j + i;
+                    if (ai >= 0 && ai <= n && bi >= 0 && bi <= m) {
+                        sum.add(coefficient(ai).mult(q.coefficient(bi)));
+                    }
+                }
+                nc[j] = sum.clone();
+            }
+        }
+
+        return new ComplexPolynomial(nc);
+    }
+
     /**
      * Returns the result of {@code this / (z - η)}.
      * @param eta (η) A zero of this.

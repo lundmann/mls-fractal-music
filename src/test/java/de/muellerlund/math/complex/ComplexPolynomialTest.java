@@ -183,6 +183,31 @@ public class ComplexPolynomialTest {
         ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-1));
     }
 
+    @Test
+    public void testMultiply() {
+        ComplexPolynomial p = new ComplexPolynomial(new MutableComplex(0, 2), new MutableComplex(4, -1), new MutableComplex(-1));
+        ComplexPolynomial q = new ComplexPolynomial();
+        ComplexPolynomial r = p.multiply(q);
+        assertThat(r.degree()).isEqualTo(-1);
+        r = q.multiply(p);
+        assertThat(r.degree()).isEqualTo(-1);
+
+        q = new ComplexPolynomial(new MutableComplex(3));
+        r = p.multiply(q);
+        assertThat(r.degree()).isEqualTo(2);
+        ComplexTestUtil.assertCloseTo(r.coefficient(2), new MutableComplex(0, 6));
+        ComplexTestUtil.assertCloseTo(r.coefficient(1), new MutableComplex(12, -3));
+        ComplexTestUtil.assertCloseTo(r.coefficient(0), new MutableComplex(-3));
+
+        q = new ComplexPolynomial(new MutableComplex(0, 3), new MutableComplex(2, 0));
+        r = p.multiply(q);
+        assertThat(r.degree()).isEqualTo(3);
+        ComplexTestUtil.assertCloseTo(r.coefficient(0), new MutableComplex(-2));
+        ComplexTestUtil.assertCloseTo(r.coefficient(1), new MutableComplex(8, -5));
+        ComplexTestUtil.assertCloseTo(r.coefficient(2), new MutableComplex(3, 16));
+        ComplexTestUtil.assertCloseTo(r.coefficient(3), new MutableComplex(-6));
+    }
+
     /**
      * @see <a href="https://de.wikipedia.org/wiki/Polynomdivision#Division_durch_Linearfaktor">Division durch Linearfaktor</a>
      */
