@@ -20,6 +20,7 @@ package de.muellerlund.math.complex;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,6 +46,25 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         for (int k = 0; k < coefficients.length; k++) {
             this.coefficients.add(coefficients[n - k - 1].clone());
         }
+    }
+
+    public static ComplexPolynomial one() {
+        return new ComplexPolynomial(MutableComplex.one());
+    }
+
+    public static ComplexPolynomial byZeros(Iterable<MutableComplex> zeroes) {
+        ComplexPolynomial p = one();
+
+        for (MutableComplex zero : zeroes) {
+            ComplexPolynomial q = new ComplexPolynomial(MutableComplex.one(), zero.clone().neg());
+            p = p.multiply(q);
+        }
+
+        return p;
+    }
+
+    public static ComplexPolynomial byZeros(MutableComplex ... zeroes) {
+        return byZeros(Arrays.asList(zeroes));
     }
 
     /**

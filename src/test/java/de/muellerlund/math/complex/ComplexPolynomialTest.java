@@ -45,6 +45,27 @@ public class ComplexPolynomialTest {
     }
 
     @Test
+    public void testConstructionByZeros() {
+        ComplexPolynomial p = ComplexPolynomial.byZeros();
+        assertThat(p.degree()).isEqualTo(0);
+        ComplexTestUtil.assertCloseTo(p.coefficient(0), MutableComplex.one());
+
+        p = ComplexPolynomial.byZeros(MutableComplex.one());
+        assertThat(p.degree()).isEqualTo(1);
+        ComplexTestUtil.assertCloseTo(p.coefficient(1), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-1));
+
+        p = ComplexPolynomial.byZeros(new MutableComplex(3),
+                                      new MutableComplex(-2),
+                                      new MutableComplex(-1));
+        assertThat(p.degree()).isEqualTo(3);
+        ComplexTestUtil.assertCloseTo(p.coefficient(3), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(p.coefficient(2), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(-7));
+        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-6));
+    }
+
+    @Test
     public void testTrivialApply() {
         ComplexPolynomial p = new ComplexPolynomial();
         for (MutableComplex z : ComplexTestUtil.someNumbers()) {
