@@ -20,6 +20,7 @@ package de.muellerlund.math.complex;
 import org.assertj.core.data.Offset;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,16 +35,15 @@ public class NewtonSolverTest {
 
     @Test
     public void testCubeAll() {
-        ComplexPolynomial p = new ComplexPolynomial(MutableComplex.one(),
-                                                    MutableComplex.zero(),
-                                                    new MutableComplex(-7),
-                                                    new MutableComplex(-6));
-        List<MutableComplex> zeros = NewtonSolver.solveAll(p, null, 1e-8);
+        List<MutableComplex> zeros = Arrays.asList(
+                new MutableComplex(3),
+                new MutableComplex(-2, 1),
+                new MutableComplex(0, 2)
+        );
+        ComplexPolynomial p = ComplexPolynomial.byZeros(zeros);
+        List<MutableComplex> solutions = NewtonSolver.solveAll(p, null, 1e-8);
         assertThat(zeros).hasSize(3);
-        ComplexTestUtil.assertContains(zeros, Offset.offset(1e-5),
-                                       new MutableComplex(3),
-                                       new MutableComplex(-2),
-                                       new MutableComplex(-1));
+        ComplexTestUtil.assertContains(solutions, Offset.offset(1e-5), zeros);
     }
 
     @Test

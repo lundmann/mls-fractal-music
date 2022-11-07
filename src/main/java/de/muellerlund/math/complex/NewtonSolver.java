@@ -45,35 +45,37 @@ public final class NewtonSolver {
 
         ComplexPolynomial pd = p.derivative();
         MutableComplex z = z0.clone();
+        MutableComplex w = p.apply(z);
+        double norm = w.norm();
+
+        if (norm <= eps2) {
+            return z;
+        }
 
         while (true) {
-            MutableComplex w = p.apply(z);
-            double norm = w.norm();
-
-            if (norm <= eps2) {
-                return z;
-            }
-
             MutableComplex qt = w.clone().div(pd.apply(z));
-            MutableComplex[] next = new MutableComplex[d];
-
-            for (int k = 0; k < d; k++) {
-                next[k] = z.clone().sub(qt.clone().rmult(k + 1));
-            }
-
-            int q = -1;
             double mn = Double.MAX_VALUE;
+            MutableComplex mz = MutableComplex.zero();
+            int q = 0;
 
             for (int k = 0; k < d; k++) {
-                double nn = z.clone().sub(next[k]).norm();
+                MutableComplex nz = z.clone().sub(qt.clone().rmult(k + 1));
+                MutableComplex nw = p.apply(nz);
+                double nn = nw.norm();
 
                 if (nn < mn) {
-                    q = k + 1;
+                    q = k;
                     mn = nn;
+                    mz = nz;
+                    w = nw;
                 }
             }
 
-            z = next[q - 1];
+            if (mn <= eps2) {
+                return mz;
+            }
+
+            z = mz;
         }
     }
 

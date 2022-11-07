@@ -21,6 +21,7 @@ import org.assertj.core.api.Fail;
 import org.assertj.core.data.Offset;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,13 +43,17 @@ final class ComplexTestUtil {
         assertThat(z.imag()).isCloseTo(w.imag(), STD_OFFSET);
     }
 
-    static void assertContains(List<MutableComplex> list, Offset<Double> offset, MutableComplex ... numbers) {
+    static void assertContains(Iterable<MutableComplex> container, Offset<Double> offset, MutableComplex ... numbers) {
+        assertContains(container, offset, Arrays.asList(numbers));
+    }
+
+    static void assertContains(Iterable<MutableComplex> container, Offset<Double> offset, Iterable<MutableComplex> numbers) {
         double r0 = offset.value;
         r0 = r0 * r0;
 
         for (MutableComplex z : numbers) {
             boolean contained = false;
-            for (MutableComplex w: list) {
+            for (MutableComplex w: container) {
                 MutableComplex r = w.clone().sub(z);
                 if (r.norm() < r0) {
                     contained = true;
@@ -85,5 +90,4 @@ final class ComplexTestUtil {
 
         return list;
     }
-
 }
