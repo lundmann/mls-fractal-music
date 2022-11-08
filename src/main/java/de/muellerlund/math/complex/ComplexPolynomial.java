@@ -242,7 +242,6 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         }
         else {
             for (int j = 0; j <= nm; j++) {
-                //int cj = nm - j;
                 MutableComplex sum = MutableComplex.zero();
                 for (int i = 0; i <= n; i++) {
                     int ai = n - i;

@@ -32,7 +32,7 @@ public final class NewtonSolver {
      * @param eps2 The square of the radius of the neighbourhood of 0.
      * @return A zero of the given complex
      */
-    public static MutableComplex solve(ComplexPolynomial p, MutableComplex z0, double eps2) {
+    public static Zero solve(ComplexPolynomial p, MutableComplex z0, double eps2) {
         int d = p.degree();
 
         if (d <= 1) {
@@ -46,11 +46,6 @@ public final class NewtonSolver {
         ComplexPolynomial pd = p.derivative();
         MutableComplex z = z0.clone();
         MutableComplex w = p.apply(z);
-        double norm = w.norm();
-
-        if (norm <= eps2) {
-            return z;
-        }
 
         while (true) {
             MutableComplex qt = w.clone().div(pd.apply(z));
@@ -69,17 +64,20 @@ public final class NewtonSolver {
                     mz = nz;
                     w = nw;
                 }
+                else {
+                    break;
+                }
             }
 
-            if (mn <= eps2) {
-                return mz;
+            if (mn < eps2) {
+                return new Zero(mz, q + 1);
             }
 
             z = mz;
         }
     }
 
-    public static List<MutableComplex> solveAll(ComplexPolynomial p, MutableComplex z0, double eps2) {
+    public static List<Zero> solveAll(ComplexPolynomial p, MutableComplex z0, double eps2) {
         if (eps2 <= 0.0) {
             throw new IllegalArgumentException("ε² must be positive.");
         }
@@ -88,7 +86,7 @@ public final class NewtonSolver {
             z0 = MutableComplex.zero();
         }
 
-        List<MutableComplex> zeros = new ArrayList<>();
+        List<Zero> zeros = new ArrayList<>();
         int n = p.degree();
 
         switch (n) {
@@ -98,22 +96,34 @@ public final class NewtonSolver {
 
             case 1:
                 MutableComplex z = p.coefficient(0).div(p.coefficient(1)).neg();
-                zeros.add(z);
+                zeros.add(new Zero(z));
                 break;
 
             case 2:
                 ComplexPolynomial pn = p.normalize();
                 MutableComplex p2 = pn.coefficient(1).rmult(0.5);
                 MutableComplex dis = p2.clone().mult(p2).sub(p.coefficient(0)).sqrt();
-                zeros.add(p2.clone().neg().add(dis));
-                zeros.add(p2.clone().neg().sub(dis));
+                p2.neg();
+
+                if (dis.norm() <= eps2) {
+                    zeros.add(new Zero(p2, 2));
+                }
+                else {
+                    zeros.add(new Zero(p2.clone().add(dis)));
+                    zeros.add(new Zero(p2.clone().sub(dis)));
+                }
 
                 break;
 
             default:
-                MutableComplex eta = solve(p, z0, eps2);
+                Zero eta = solve(p, z0, eps2);
                 zeros.add(eta);
-                zeros.addAll(solveAll(p.splitZero(eta), eta, eps2));
+
+                for (int i = 0; i < eta.quantity(); i++) {
+                    p = p.splitZero(eta.value());
+                }
+
+                zeros.addAll(solveAll(p, eta.value(), eps2));
                 break;
         }
 
