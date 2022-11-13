@@ -124,6 +124,16 @@ public class NewtonSolverTest {
         assertThat(zero.quantity()).isEqualTo(2);
     }
 
+    @Test
+    public void testDivergentDeg3() {
+        ComplexPolynomial p = new ComplexPolynomial(MutableComplex.one(),
+                                                    new MutableComplex(-2),
+                                                    MutableComplex.zero(),
+                                                    new MutableComplex(-1, 0.2));
+        List<Zero> zeros = NewtonSolver.solveAll(p, MutableComplex.one().neg(), 1e-15);
+        assertThat(zeros).hasSize(3);
+    }
+
     private static Zero zeroByValue(Iterable<Zero> zeros, MutableComplex value, double eps2) {
         for (Zero zero : zeros) {
             if (zero.value().clone().sub(value).norm() < eps2) {

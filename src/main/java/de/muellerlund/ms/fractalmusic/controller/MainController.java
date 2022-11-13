@@ -19,8 +19,9 @@ package de.muellerlund.ms.fractalmusic.controller;
 
 import de.muellerlund.math.complex.MutableComplex;
 import de.muellerlund.ms.fractalmusic.calculation.Calculator;
+import de.muellerlund.ms.fractalmusic.calculation.ComplexFractal;
 import de.muellerlund.ms.fractalmusic.calculation.ExtendedComplex;
-import de.muellerlund.ms.fractalmusic.calculation.fractals.SquareFractal;
+import de.muellerlund.ms.fractalmusic.fractal.FractalHelper;
 import de.muellerlund.ms.fractalmusic.util.ImageHelper;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -56,19 +57,52 @@ public class MainController {
 
     @GetMapping(value = "/fractal-music/png", produces = MediaType.IMAGE_PNG_VALUE)
     public @ResponseBody byte[] retrieveAsPng(
-            @RequestParam(required = false) Integer n,
-            @RequestParam(required = false) String c0,
-            @RequestParam(required = false) String z0
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Integer imax,
+            @RequestParam(required = false) String z0,
+            @RequestParam(required = false) String a5,
+            @RequestParam(required = false) String a4,
+            @RequestParam(required = false) String a3,
+            @RequestParam(required = false) String a2,
+            @RequestParam(required = false) String a1,
+            @RequestParam(required = false) String a0
     ) {
-        SquareFractal fractal = new SquareFractal();
-        MutableComplex v0 = parseComplex(c0, MutableComplex.i(), locale);
-        fractal.getC().assign(v0);
-        MutableComplex w0 = parseComplex(z0, MutableComplex.one(), locale);
-        n = n == null ? 10 : n;
-
-        List<ExtendedComplex> numbers = Calculator.calculate(fractal, w0.complex(), n);
+        List<ExtendedComplex> numbers = apply(type, imax, z0, a5, a4, a3, a2, a1, a0);
         BufferedImage image = createImage(numbers);
 
         return ImageHelper.asBytes(image, "png");
+    }
+
+    private List<ExtendedComplex> apply(
+            String type,
+            Integer imax,
+            String sz0,
+            String ... sc
+    ) {
+        MutableComplex z0 = parseComplex(sz0, MutableComplex.one(), locale);
+
+        int n = sc.length; // as invoked it must be 6
+        int deg = n;
+        int k = n;
+
+        for (int i = 0; i < n; i++) {
+            if (sc[i] != null) {
+                deg = n - i - 1;
+                k = i;
+                break;
+            }
+        }
+
+        MutableComplex[] coefficients = new MutableComplex[deg + 1];
+        for (int i = k; i < n; i++) {
+            MutableComplex dv = i == k ? MutableComplex.one() : MutableComplex.zero();
+            MutableComplex z = parseComplex(sc[i], dv, locale);
+            coefficients[i - k] = z;
+        }
+
+        ComplexFractal fractal = FractalHelper.find(type, coefficients);
+        imax = imax == null ? 10 : imax;
+
+        return Calculator.calculate(fractal, z0.complex(), imax);
     }
 }

@@ -47,8 +47,27 @@ public final class NewtonSolver {
         MutableComplex z = z0.clone();
         MutableComplex w = p.apply(z);
 
+        if (w.norm() < eps2) { // maybe we enter with a zero
+            ComplexPolynomial q = pd;
+            for (int k = 1; k <= d; k++) {
+                if (q.apply(z).norm() >= eps2) {
+                    return new Zero(z, k);
+                }
+                q = q.derivative();
+            }
+
+            // should not happen! 😜
+            throw new IllegalStateException("Unexpected zero state.");
+        }
+
         while (true) {
-            MutableComplex qt = w.clone().div(pd.apply(z));
+            MutableComplex dd = getDivider(pd, z);
+            MutableComplex qt = w.clone().div(dd);
+            if (qt.isInfinite()) {
+                // should not happen! 😜
+                throw new ArithmeticException("Division by zero.");
+            }
+
             double mn = Double.MAX_VALUE;
             MutableComplex mz = MutableComplex.zero();
             int q = 0;
@@ -75,6 +94,18 @@ public final class NewtonSolver {
 
             z = mz;
         }
+    }
+
+    private static MutableComplex getDivider(ComplexPolynomial pd, MutableComplex z) {
+        MutableComplex w = MutableComplex.zero();
+        while (w.assign(pd.apply(z)).isZero()) {
+            pd = pd.derivative();
+            if (pd.degree() == 0 && pd.coefficient(0).isZero()) {
+                throw new IllegalArgumentException("Illegal zero-Polynomial.");
+            }
+        }
+
+        return w;
     }
 
     public static List<Zero> solveAll(ComplexPolynomial p, MutableComplex z0, double eps2) {

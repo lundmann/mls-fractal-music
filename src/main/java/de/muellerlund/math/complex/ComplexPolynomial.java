@@ -160,6 +160,12 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         return p;
     }
 
+    public void move(MutableComplex z) {
+        if (!coefficients.isEmpty()) {
+            coefficients.get(0).add(z);
+        }
+    }
+
     /**
      * Returns the (first order) derivative of this polynomial.
      *
