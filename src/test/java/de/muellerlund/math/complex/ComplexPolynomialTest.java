@@ -118,7 +118,7 @@ public class ComplexPolynomialTest {
         p = new ComplexPolynomial(new MutableComplex(7));
         q = p.normalize();
         assertThat(q.degree()).isEqualTo(0);
-        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(7));
+        ComplexTestUtil.assertCloseTo(q.coefficient(0), MutableComplex.one());
 
         p = new ComplexPolynomial(MutableComplex.i(), new MutableComplex(7));
         q = p.normalize();

@@ -148,7 +148,7 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         ComplexPolynomial p = clone();
         int n = degree();
 
-        if (n >= 1) {
+        if (n >= 0) {
             MutableComplex d = coefficient(n);
             p.coefficients.get(n).assign(MutableComplex.one());
 
