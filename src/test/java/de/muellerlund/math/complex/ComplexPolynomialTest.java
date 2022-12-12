@@ -31,38 +31,38 @@ public class ComplexPolynomialTest {
 
         p = new ComplexPolynomial(MutableComplex.one());
         assertThat(p.degree()).isEqualTo(0);
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), MutableComplex.one());
-        ComplexTestUtil.assertCloseTo(p.coefficient(-1), MutableComplex.zero());
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(0), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(p.get(-1), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(1), MutableComplex.zero());
 
         p = new ComplexPolynomial(new MutableComplex(0, 2), MutableComplex.zero(), new MutableComplex(-1));
         assertThat(p.degree()).isEqualTo(2);
-        ComplexTestUtil.assertCloseTo(p.coefficient(3), MutableComplex.zero());
-        ComplexTestUtil.assertCloseTo(p.coefficient(2), new MutableComplex(0, 2));
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), MutableComplex.zero());
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-1));
-        ComplexTestUtil.assertCloseTo(p.coefficient(-1), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(3), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(2), new MutableComplex(0, 2));
+        ComplexTestUtil.assertCloseTo(p.get(1), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(-1));
+        ComplexTestUtil.assertCloseTo(p.get(-1), MutableComplex.zero());
     }
 
     @Test
     public void testConstructionByZeros() {
         ComplexPolynomial p = ComplexPolynomial.byZeros();
         assertThat(p.degree()).isEqualTo(0);
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(p.get(0), MutableComplex.one());
 
         p = ComplexPolynomial.byZeros(MutableComplex.one());
         assertThat(p.degree()).isEqualTo(1);
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), MutableComplex.one());
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-1));
+        ComplexTestUtil.assertCloseTo(p.get(1), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(-1));
 
         p = ComplexPolynomial.byZeros(new MutableComplex(3),
                                       new MutableComplex(-2),
                                       new MutableComplex(-1));
         assertThat(p.degree()).isEqualTo(3);
-        ComplexTestUtil.assertCloseTo(p.coefficient(3), MutableComplex.one());
-        ComplexTestUtil.assertCloseTo(p.coefficient(2), MutableComplex.zero());
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(-7));
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-6));
+        ComplexTestUtil.assertCloseTo(p.get(3), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(p.get(2), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(1), new MutableComplex(-7));
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(-6));
     }
 
     @Test
@@ -107,9 +107,9 @@ public class ComplexPolynomialTest {
         ComplexPolynomial p = new ComplexPolynomial(new MutableComplex(2), MutableComplex.zero(), new MutableComplex(-1));
         ComplexPolynomial q = p.normalize();
         assertThat(q.degree()).isEqualTo(2);
-        ComplexTestUtil.assertCloseTo(q.coefficient(2), MutableComplex.one());
-        ComplexTestUtil.assertCloseTo(q.coefficient(1), MutableComplex.zero());
-        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(-0.5));
+        ComplexTestUtil.assertCloseTo(q.get(2), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(q.get(1), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(q.get(0), new MutableComplex(-0.5));
 
         p = new ComplexPolynomial();
         q = p.normalize();
@@ -118,13 +118,13 @@ public class ComplexPolynomialTest {
         p = new ComplexPolynomial(new MutableComplex(7));
         q = p.normalize();
         assertThat(q.degree()).isEqualTo(0);
-        ComplexTestUtil.assertCloseTo(q.coefficient(0), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(q.get(0), MutableComplex.one());
 
         p = new ComplexPolynomial(MutableComplex.i(), new MutableComplex(7));
         q = p.normalize();
         assertThat(q.degree()).isEqualTo(1);
-        ComplexTestUtil.assertCloseTo(q.coefficient(1), MutableComplex.one());
-        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(0, -7)); // because 1/i = -i
+        ComplexTestUtil.assertCloseTo(q.get(1), MutableComplex.one());
+        ComplexTestUtil.assertCloseTo(q.get(0), new MutableComplex(0, -7)); // because 1/i = -i
     }
 
     @Test
@@ -140,7 +140,7 @@ public class ComplexPolynomialTest {
         for (MutableComplex c : ComplexTestUtil.someNumbers()) {
             p = new ComplexPolynomial(c, MutableComplex.one()).derivative();
             assertThat(p.degree()).isEqualTo(0);
-            ComplexTestUtil.assertCloseTo(p.coefficient(0), c);
+            ComplexTestUtil.assertCloseTo(p.get(0), c);
         }
     }
 
@@ -149,29 +149,29 @@ public class ComplexPolynomialTest {
         ComplexPolynomial p = new ComplexPolynomial(new MutableComplex(0, 2), new MutableComplex(4, -1),
                                                     new MutableComplex(-1)).derivative();
         assertThat(p.degree()).isEqualTo(1);
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(0, 4));
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(4, -1));
+        ComplexTestUtil.assertCloseTo(p.get(1), new MutableComplex(0, 4));
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(4, -1));
 
         p = new ComplexPolynomial(new MutableComplex(3, 1),
                                   new MutableComplex(0, 2),
                                   new MutableComplex(4, -1),
                                   new MutableComplex(-1)).derivative();
         assertThat(p.degree()).isEqualTo(2);
-        ComplexTestUtil.assertCloseTo(p.coefficient(2), new MutableComplex(9, 3));
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(0, 4));
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(4, -1));
+        ComplexTestUtil.assertCloseTo(p.get(2), new MutableComplex(9, 3));
+        ComplexTestUtil.assertCloseTo(p.get(1), new MutableComplex(0, 4));
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(4, -1));
     }
 
     @Test
     public void testTrivialIntegrals() {
         ComplexPolynomial p = new ComplexPolynomial().integral();
         assertThat(p.degree()).isEqualTo(0);
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), MutableComplex.zero());
+        ComplexTestUtil.assertCloseTo(p.get(0), MutableComplex.zero());
 
         for (MutableComplex c : ComplexTestUtil.someNumbers()) {
             p = new ComplexPolynomial().integral(c);
             assertThat(p.degree()).isEqualTo(0);
-            ComplexTestUtil.assertCloseTo(p.coefficient(0), c);
+            ComplexTestUtil.assertCloseTo(p.get(0), c);
         }
     }
 
@@ -180,28 +180,28 @@ public class ComplexPolynomialTest {
         ComplexPolynomial p = new ComplexPolynomial(new MutableComplex(0, 2), new MutableComplex(4, -1),
                                                     new MutableComplex(-1)).integral(new MutableComplex(1, -2));
         assertThat(p.degree()).isEqualTo(3);
-        ComplexTestUtil.assertCloseTo(p.coefficient(3), new MutableComplex(0, 2.0 / 3.0));
-        ComplexTestUtil.assertCloseTo(p.coefficient(2), new MutableComplex(2, -0.5));
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(-1));
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(1, -2));
+        ComplexTestUtil.assertCloseTo(p.get(3), new MutableComplex(0, 2.0 / 3.0));
+        ComplexTestUtil.assertCloseTo(p.get(2), new MutableComplex(2, -0.5));
+        ComplexTestUtil.assertCloseTo(p.get(1), new MutableComplex(-1));
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(1, -2));
 
         p = new ComplexPolynomial(new MutableComplex(3, 1),
                                   new MutableComplex(0, 2),
                                   new MutableComplex(4, -1),
                                   new MutableComplex(-1)).integral(new MutableComplex(1, -2));
         assertThat(p.degree()).isEqualTo(4);
-        ComplexTestUtil.assertCloseTo(p.coefficient(4), new MutableComplex(0.75, 0.25));
-        ComplexTestUtil.assertCloseTo(p.coefficient(3), new MutableComplex(0, 2.0 / 3.0));
-        ComplexTestUtil.assertCloseTo(p.coefficient(2), new MutableComplex(2, -0.5));
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(-1));
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(1, -2));
+        ComplexTestUtil.assertCloseTo(p.get(4), new MutableComplex(0.75, 0.25));
+        ComplexTestUtil.assertCloseTo(p.get(3), new MutableComplex(0, 2.0 / 3.0));
+        ComplexTestUtil.assertCloseTo(p.get(2), new MutableComplex(2, -0.5));
+        ComplexTestUtil.assertCloseTo(p.get(1), new MutableComplex(-1));
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(1, -2));
 
         p = p.derivative();
         assertThat(p.degree()).isEqualTo(3);
-        ComplexTestUtil.assertCloseTo(p.coefficient(3), new MutableComplex(3, 1));
-        ComplexTestUtil.assertCloseTo(p.coefficient(2), new MutableComplex(0, 2));
-        ComplexTestUtil.assertCloseTo(p.coefficient(1), new MutableComplex(4, -1));
-        ComplexTestUtil.assertCloseTo(p.coefficient(0), new MutableComplex(-1));
+        ComplexTestUtil.assertCloseTo(p.get(3), new MutableComplex(3, 1));
+        ComplexTestUtil.assertCloseTo(p.get(2), new MutableComplex(0, 2));
+        ComplexTestUtil.assertCloseTo(p.get(1), new MutableComplex(4, -1));
+        ComplexTestUtil.assertCloseTo(p.get(0), new MutableComplex(-1));
     }
 
     @Test
@@ -216,17 +216,17 @@ public class ComplexPolynomialTest {
         q = new ComplexPolynomial(new MutableComplex(3));
         r = p.multiply(q);
         assertThat(r.degree()).isEqualTo(2);
-        ComplexTestUtil.assertCloseTo(r.coefficient(2), new MutableComplex(0, 6));
-        ComplexTestUtil.assertCloseTo(r.coefficient(1), new MutableComplex(12, -3));
-        ComplexTestUtil.assertCloseTo(r.coefficient(0), new MutableComplex(-3));
+        ComplexTestUtil.assertCloseTo(r.get(2), new MutableComplex(0, 6));
+        ComplexTestUtil.assertCloseTo(r.get(1), new MutableComplex(12, -3));
+        ComplexTestUtil.assertCloseTo(r.get(0), new MutableComplex(-3));
 
         q = new ComplexPolynomial(new MutableComplex(0, 3), new MutableComplex(2, 0));
         r = p.multiply(q);
         assertThat(r.degree()).isEqualTo(3);
-        ComplexTestUtil.assertCloseTo(r.coefficient(0), new MutableComplex(-2));
-        ComplexTestUtil.assertCloseTo(r.coefficient(1), new MutableComplex(8, -5));
-        ComplexTestUtil.assertCloseTo(r.coefficient(2), new MutableComplex(3, 16));
-        ComplexTestUtil.assertCloseTo(r.coefficient(3), new MutableComplex(-6));
+        ComplexTestUtil.assertCloseTo(r.get(0), new MutableComplex(-2));
+        ComplexTestUtil.assertCloseTo(r.get(1), new MutableComplex(8, -5));
+        ComplexTestUtil.assertCloseTo(r.get(2), new MutableComplex(3, 16));
+        ComplexTestUtil.assertCloseTo(r.get(3), new MutableComplex(-6));
     }
 
     /**
@@ -244,10 +244,10 @@ public class ComplexPolynomialTest {
 
         final Offset<Double> OFFSET = offset(1e-6);
 
-        ComplexTestUtil.assertCloseTo(q.coefficient(4), new MutableComplex(2), OFFSET);
-        ComplexTestUtil.assertCloseTo(q.coefficient(3), new MutableComplex(-4.968331), OFFSET);
-        ComplexTestUtil.assertCloseTo(q.coefficient(2), new MutableComplex(6.405496), OFFSET);
-        ComplexTestUtil.assertCloseTo(q.coefficient(1), new MutableComplex(-0.101321), OFFSET);
-        ComplexTestUtil.assertCloseTo(q.coefficient(0), new MutableComplex(1.549056), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.get(4), new MutableComplex(2), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.get(3), new MutableComplex(-4.968331), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.get(2), new MutableComplex(6.405496), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.get(1), new MutableComplex(-0.101321), OFFSET);
+        ComplexTestUtil.assertCloseTo(q.get(0), new MutableComplex(1.549056), OFFSET);
     }
 }
