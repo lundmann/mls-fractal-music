@@ -30,7 +30,15 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
     @Serial
     private static final long serialVersionUID = 2727764094976172956L;
 
-    private List<MutableComplex> coefficients = new ArrayList<>();
+    private List<MutableComplex> coefficients;
+
+    private ComplexPolynomial(int n) {
+        coefficients = new ArrayList<>();
+
+        for (int k = 0; k <= n; k++) {
+            coefficients.add(MutableComplex.zero());
+        }
+    }
 
     /**
      * "Natural" constructor, the highest order coefficient appears first.
@@ -41,10 +49,10 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
      * @param coefficients Complex coefficients, the highest order coefficient appears first.
      */
     public ComplexPolynomial(MutableComplex ... coefficients) {
-        int n = coefficients.length;
+        this.coefficients = new ArrayList<>();
 
-        for (int k = 0; k < coefficients.length; k++) {
-            this.coefficients.add(coefficients[n - k - 1].clone());
+        for (MutableComplex c : coefficients) {
+            this.coefficients.add(c.clone());
         }
     }
 
@@ -78,6 +86,16 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         return coefficients.size() - 1;
     }
 
+    public MutableComplex get(int index) {
+        int n = degree();
+        return index >= 0 && index <= n ? coefficients.get(n - index).clone() : MutableComplex.zero();
+    }
+
+    private void set(int index, MutableComplex z) {
+        int n = degree();
+        coefficients.set(n - index, z.clone());
+    }
+
     /**
      * Returns a clone of the k'th coefficient of this polynomial.
      *
@@ -85,10 +103,11 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
      * @param k The index of the requested coefficient.
      *
      * @return a clone of the k'th coefficient of this polynomial.
+     * @deprecated
      */
+    @Deprecated
     public MutableComplex coefficient(int k) {
-        int n = degree();
-        return k > n || k < 0 ? MutableComplex.zero() : coefficients.get(k).clone();
+        return get(k);
     }
 
     /**
@@ -138,7 +157,7 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         MutableComplex s = MutableComplex.zero();
 
         for (int k = 0; k <= n; k++) {
-            s.add(coefficient(k).mult(powers[k]));
+            s.add(get(k).mult(powers[k]));
         }
 
         return s;
@@ -148,16 +167,22 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         ComplexPolynomial p = clone();
         int n = degree();
 
-        if (n >= 1) {
-            MutableComplex d = coefficient(n);
-            p.coefficients.get(n).assign(MutableComplex.one());
+        if (n >= 0) {
+            MutableComplex d = get(n);
+            p.set(n, MutableComplex.one());
 
             for (int k = 0; k < n; k++) {
-                p.coefficients.get(k).div(d);
+                p.set(k, get(k).div(d));
             }
         }
 
         return p;
+    }
+
+    public void move(MutableComplex z) {
+        if (!coefficients.isEmpty()) {
+            set(0, get(0).add(z));
+        }
     }
 
     /**
@@ -175,13 +200,13 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
             return new ComplexPolynomial();
         }
 
-        MutableComplex[] nc = new MutableComplex[n];
+        ComplexPolynomial p = new ComplexPolynomial(n - 1);
 
         for (int k = 1; k <= n; k++) {
-            nc[n - k] = coefficient(k).rmult(k);
+            p.set(k - 1, get(k).rmult(k));
         }
 
-        return new ComplexPolynomial(nc);
+        return p;
     }
 
     /**
@@ -205,14 +230,14 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
     public ComplexPolynomial integral(MutableComplex c) {
         int n = degree();
 
-        MutableComplex[] nc = new MutableComplex[n + 2];
-        nc[n + 1] = c.clone();
+        ComplexPolynomial p = new ComplexPolynomial(n + 1);
+        p.set(0, c);
 
         for (int k = 0; k <= n; k++) {
-            nc[n - k] = coefficient(k).rmult(1.0 / (k + 1));
+            p.set(k + 1, get(k).rmult(1.0 / (k + 1)));
         }
 
-        return new ComplexPolynomial(nc);
+        return p;
     }
 
     public ComplexPolynomial multiply(ComplexPolynomial q) {
@@ -232,29 +257,27 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         }
 
         int nm = n + m;
-        MutableComplex[] nc = new MutableComplex[nm + 1];
+        ComplexPolynomial p = new ComplexPolynomial(nm);
 
         if (m == 0) {
             MutableComplex b0 = q.coefficient(0);
             for (int j = 0; j <= n; j++) {
-                nc[n - j] = coefficient(j).mult(b0);
+                p.set(j, get(j).mult(b0));
             }
         }
         else {
             for (int j = 0; j <= nm; j++) {
                 MutableComplex sum = MutableComplex.zero();
                 for (int i = 0; i <= n; i++) {
-                    int ai = n - i;
-                    int bi = m - j + i;
-                    if (ai >= 0 && ai <= n && bi >= 0 && bi <= m) {
-                        sum.add(coefficient(ai).mult(q.coefficient(bi)));
+                    if (j - i >= 0 && j - i <= m) {
+                        sum.add(get(i).mult(q.get(j - i)));
                     }
                 }
-                nc[j] = sum.clone();
+                p.set(j, sum);
             }
         }
 
-        return new ComplexPolynomial(nc);
+        return p;
     }
 
     /**
@@ -269,15 +292,16 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
             return new ComplexPolynomial();
         }
 
-        MutableComplex[] nc = new MutableComplex[n];
+        ComplexPolynomial p = new ComplexPolynomial(n - 1);
         MutableComplex carry = MutableComplex.zero();
 
         for (int k = n - 1; k >= 0; k--) {
-            MutableComplex c = coefficient(k + 1);
-            nc[n - k - 1] = c.clone().add(carry);
-            carry.add(c).mult(eta);
+            MutableComplex c = get(k + 1);
+            carry.add(c);
+            p.set(k, carry);
+            carry.mult(eta);
         }
 
-        return new ComplexPolynomial(nc);
+        return p;
     }
 }

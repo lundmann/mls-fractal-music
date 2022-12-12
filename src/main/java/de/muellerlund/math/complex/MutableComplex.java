@@ -127,6 +127,18 @@ public final class MutableComplex implements Cloneable, Serializable {
         return complex().toString();
     }
 
+    public boolean isZero() {
+        return re == 0.0 && im == 0.0;
+    }
+
+    public boolean isNaN() {
+        return Double.isNaN(re) || Double.isNaN(im);
+    }
+
+    public boolean isInfinite() {
+        return Double.isInfinite(re) || Double.isInfinite(im);
+    }
+
     public MutableComplex neg() {
         re = -re;
         im = -im;
@@ -222,9 +234,18 @@ public final class MutableComplex implements Cloneable, Serializable {
 
     public MutableComplex div(MutableComplex w) {
         double nw = w.norm();
-        double t = (re * w.re + im * w.im) / nw;
-        im = (im * w.re - re * w.im) / nw;
-        re = t;
+
+        if (nw > 0.0) {
+            double t = (re * w.re + im * w.im) / nw;
+            im = (im * w.re - re * w.im) / nw;
+            re = t;
+        }
+        else {
+            //noinspection divzero
+            re /= 0.0;
+            //noinspection divzero
+            im /= 0.0;
+        }
 
         return this;
     }

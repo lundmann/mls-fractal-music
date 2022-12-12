@@ -17,7 +17,11 @@
 
 package de.muellerlund.ms.fractalmusic.fractal;
 
+import de.muellerlund.math.complex.MutableComplex;
+import de.muellerlund.ms.fractalmusic.calculation.ComplexFractal;
 import de.muellerlund.ms.fractalmusic.calculation.ExtendedComplex;
+import de.muellerlund.ms.fractalmusic.calculation.fractals.PolynomialFractal;
+import de.muellerlund.ms.fractalmusic.calculation.fractals.SquareFractal;
 import org.apache.commons.math3.complex.Complex;
 
 import java.awt.*;
@@ -83,5 +87,28 @@ public final class FractalHelper {
         }
 
         return new Rectangle2D.Double(rMin, iMin, rMax - rMin, iMax - iMin);
+    }
+
+    public static ComplexFractal find(String type, MutableComplex[] coefficients) {
+        // No reflection bullshit!
+        if (type == null || type.isBlank()) {
+            type = "square";
+        }
+
+        ComplexFractal fractal = null;
+        type = type.toLowerCase();
+
+        switch (type) {
+            case "sq", "square" -> {
+                SquareFractal sf = new SquareFractal();
+                MutableComplex z = coefficients[0];
+                z = z == null ? MutableComplex.zero() : z;
+                sf.getC().assign(z);
+                fractal = sf;
+            }
+            case "pol", "polynomial" -> fractal = new PolynomialFractal(coefficients);
+        }
+
+        return fractal;
     }
 }
