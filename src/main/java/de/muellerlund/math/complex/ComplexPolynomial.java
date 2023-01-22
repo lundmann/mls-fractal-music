@@ -97,20 +97,6 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
     }
 
     /**
-     * Returns a clone of the k'th coefficient of this polynomial.
-     *
-     * <p>If k is not in range of {@code [0, this.degree()]} this method returns zero.</p>
-     * @param k The index of the requested coefficient.
-     *
-     * @return a clone of the k'th coefficient of this polynomial.
-     * @deprecated
-     */
-    @Deprecated
-    public MutableComplex coefficient(int k) {
-        return get(k);
-    }
-
-    /**
      * Returns a deep clone of this polynomial.
      *
      * @return a deep clone of this polynomial.
@@ -260,7 +246,7 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         ComplexPolynomial p = new ComplexPolynomial(nm);
 
         if (m == 0) {
-            MutableComplex b0 = q.coefficient(0);
+            MutableComplex b0 = q.get(0);
             for (int j = 0; j <= n; j++) {
                 p.set(j, get(j).mult(b0));
             }
