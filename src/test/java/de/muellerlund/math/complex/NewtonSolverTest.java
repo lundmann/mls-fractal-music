@@ -18,7 +18,7 @@
 package de.muellerlund.math.complex;
 
 import org.assertj.core.data.Offset;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
