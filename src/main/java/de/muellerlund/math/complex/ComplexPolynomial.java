@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Sönke Müller-Lund
+ * Copyright 2023 Sönke Müller-Lund
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
