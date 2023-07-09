@@ -1,2 +1,5 @@
+server:
+  port: 9123
+
 mls:
   locale: "en_US"

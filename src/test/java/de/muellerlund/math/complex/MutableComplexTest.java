@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Sönke Müller-Lund
+ * Copyright 2023 Sönke Müller-Lund
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package de.muellerlund.math.complex;
 
 import org.apache.commons.math3.complex.Complex;
 import org.assertj.core.data.Offset;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.offset;

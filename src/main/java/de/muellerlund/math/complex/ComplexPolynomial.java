@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Sönke Müller-Lund
+ * Copyright 2023 Sönke Müller-Lund
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,20 +94,6 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
     private void set(int index, MutableComplex z) {
         int n = degree();
         coefficients.set(n - index, z.clone());
-    }
-
-    /**
-     * Returns a clone of the k'th coefficient of this polynomial.
-     *
-     * <p>If k is not in range of {@code [0, this.degree()]} this method returns zero.</p>
-     * @param k The index of the requested coefficient.
-     *
-     * @return a clone of the k'th coefficient of this polynomial.
-     * @deprecated
-     */
-    @Deprecated
-    public MutableComplex coefficient(int k) {
-        return get(k);
     }
 
     /**
@@ -260,7 +246,7 @@ public final class ComplexPolynomial implements Cloneable, Serializable {
         ComplexPolynomial p = new ComplexPolynomial(nm);
 
         if (m == 0) {
-            MutableComplex b0 = q.coefficient(0);
+            MutableComplex b0 = q.get(0);
             for (int j = 0; j <= n; j++) {
                 p.set(j, get(j).mult(b0));
             }

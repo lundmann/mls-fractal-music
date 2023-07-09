@@ -23,7 +23,7 @@ plugins {
 
 java {
     group = "de.muellerlund"
-    version = "0.2.0-SNAPSHOT"
+    version = "0.2.3-SNAPSHOT"
 
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
@@ -41,11 +41,8 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.assertj:assertj-core:3.23.1")
-    testImplementation("org.testng:testng:7.6.1")
 }
 
-tasks.getByName<Test>("test") {
-    useTestNG() {
-        useDefaultListeners = true // Tells TestNG to execute its default reporting structure
-    }
+tasks.withType<Test> {
+    useJUnitPlatform()
 }

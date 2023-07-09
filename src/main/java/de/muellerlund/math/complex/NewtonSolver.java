@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Sönke Müller-Lund
+ * Copyright 2023 Sönke Müller-Lund
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ public final class NewtonSolver {
         MutableComplex w = MutableComplex.zero();
         while (w.assign(pd.apply(z)).isZero()) {
             pd = pd.derivative();
-            if (pd.degree() == 0 && pd.coefficient(0).isZero()) {
+            if (pd.degree() == 0 && pd.get(0).isZero()) {
                 throw new IllegalArgumentException("Illegal zero-Polynomial.");
             }
         }
@@ -126,14 +126,14 @@ public final class NewtonSolver {
                 break;
 
             case 1:
-                MutableComplex z = p.coefficient(0).div(p.coefficient(1)).neg();
+                MutableComplex z = p.get(0).div(p.get(1)).neg();
                 zeros.add(new Zero(z));
                 break;
 
             case 2:
                 ComplexPolynomial pn = p.normalize();
-                MutableComplex p2 = pn.coefficient(1).rmult(0.5);
-                MutableComplex dis = p2.clone().mult(p2).sub(p.coefficient(0)).sqrt();
+                MutableComplex p2 = pn.get(1).rmult(0.5);
+                MutableComplex dis = p2.clone().mult(p2).sub(p.get(0)).sqrt();
                 p2.neg();
 
                 if (dis.norm() <= eps2) {
